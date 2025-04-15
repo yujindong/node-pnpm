@@ -1,0 +1,23 @@
+language: minimal
+
+services:
+  - docker
+
+env:
+  global:
+    - DOCKER_USERNAME=yujindong
+    # 请在Travis CI的项目设置中添加DOCKER_PASSWORD环境变量
+
+jobs:
+  include:
+    - stage: build
+      if: tag IS present
+      script:
+        # 使用ARG参数传入Node版本
+        - docker build --build-arg NODE_VERSION=$NODE_VERSION -t $DOCKER_USERNAME/node-pnpm:$TRAVIS_TAG .
+    - stage: deploy
+      # 只有在tag推送或main分支更新时才部署
+      if: tag IS present
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push $DOCKER_USERNAME/node-pnpm:$TRAVIS_TAG
