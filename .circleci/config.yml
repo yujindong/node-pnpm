@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   node-versions:
     type: string
-    default: "20-slim,20-alpine,22-slim,22-alpine,23-slim,23-alpine"
+    default: "23-slim"
 
 jobs:
   build-and-push:
