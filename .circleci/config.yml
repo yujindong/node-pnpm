@@ -1,0 +1,42 @@
+version: 2.1
+
+parameters:
+  node-versions:
+    type: string
+    default: "20-slim,20-alpine,22-slim,22-alpine,23-slim,23-alpine"
+
+jobs:
+  build-and-push:
+    parameters:
+      node-version:
+        type: string
+    docker:
+      - image: cimg/base:2024.01
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+      - run:
+          name: 登录到Docker Hub
+          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run:
+          name: 构建镜像
+          command: |
+            echo "构建 node-pnpm:<< parameters.node-version >>"
+            docker build \
+              --build-arg NODE_VERSION=<< parameters.node-version >> \
+              -t $DOCKER_USERNAME/node-pnpm:<< parameters.node-version >> .
+      - run:
+          name: 推送镜像
+          command: |
+            docker push $DOCKER_USERNAME/node-pnpm:<< parameters.node-version >>
+
+workflows:
+  build-all-versions:
+    jobs:
+      - build-and-push:
+          matrix:
+            parameters:
+              node-version: [ << pipeline.parameters.node-versions >> ]
+          context:
+            - docker-hub-credentials
