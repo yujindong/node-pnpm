@@ -8,5 +8,5 @@
 
 ```bash
 # 使用最新版本
-docker pull yujindong/node-pnpm:23-slim
+docker pull yujindong/node-pnpm:23-slim 
 
